@@ -9,8 +9,8 @@ import {
 import TicketFinder from '../TicketFinder/TicketFinder';
 
 // Client ID and API key from the Developer Console
-var CLIENT_ID = '917849568600-tsfpk9a7ime5mp05mbi2m50pa6dmdvdv.apps.googleusercontent.com';
-var API_KEY = 'AIzaSyDb8dSoxdfaQagxcZPP4PBponQoyiRyQ9I';
+var CLIENT_ID = 'secret';
+var API_KEY = 'secret';
 
 // Array of API discovery doc URLs for APIs used by the quickstart
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"];
