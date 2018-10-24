@@ -6,11 +6,12 @@ import {
   Button,
 } from 'evergreen-ui';
 
+import config from '../../config';
 import TicketFinder from '../TicketFinder/TicketFinder';
 
 // Client ID and API key from the Developer Console
-var CLIENT_ID = 'secret';
-var API_KEY = 'secret';
+var CLIENT_ID = config.GOOGLE_CLIENT_ID;
+var API_KEY = config.GOOGLE_API_KEY;
 
 // Array of API discovery doc URLs for APIs used by the quickstart
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"];
