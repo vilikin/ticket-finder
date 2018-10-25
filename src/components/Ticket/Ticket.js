@@ -4,7 +4,7 @@ import { Pane, Text, Icon, Badge } from 'evergreen-ui';
 export default class Ticket extends Component {
   render() {
     return (
-      <Pane display="flex" flexDirection="column" elevation="1" padding={8}>
+      <Pane onClick={this.props.onClick} display="flex" flexDirection="column" elevation="1" padding={8}>
         <Pane display="flex" flex={1} flexDirection="row">
           <Pane display="flex" flex={1} alignItems="center" justifyContent="center" flexDirection="column">
             <Text fontWeight="bold">Tampere</Text>

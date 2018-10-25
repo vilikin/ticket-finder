@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "base64url": "^3.0.0",
     "evergreen-ui": "^4.0.2",
     "gmail-api-parse-message": "^2.1.0",
     "moment": "^2.22.2",

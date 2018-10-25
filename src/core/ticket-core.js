@@ -7,6 +7,8 @@ import {
   timeAndDateStringsToMoment,
 } from '../utils/helpers';
 
+import base64url from 'base64url';
+
 function assertGapiAuthenticated() {
   if (gapi.auth2.getAuthInstance().isSignedIn.get() === false) {
     throw new Error('Google API not authenticated');
@@ -23,6 +25,19 @@ async function getMessage(id) {
   return parsedMessage;
 }
 
+async function getQrCodeDataURI(messageId, attachmentId) {
+  const { result } = await gapi.client.gmail.users.messages.attachments.get({
+    'userId': 'me',
+    'id': attachmentId,
+    'messageId': messageId,
+  });
+
+  // Gmail API gives us a Base64_urlencoded image
+  // We need to convert it to normal Base64 for data URI
+  const base64Image = base64url.toBase64(result.data);
+  return `data:image/png;base64,${base64Image}`;
+}
+
 async function* findMostRelevantTickets() {
   assertGapiAuthenticated();
   
@@ -33,7 +48,7 @@ async function* findMostRelevantTickets() {
 
   const messageIds = _.chain(messages)
     .map('id')
-    .slice(0, 2)
+    .slice(0, 1)
     .value();
 
   console.log(messageIds);
@@ -50,6 +65,7 @@ async function* findMostRelevantTickets() {
       const ticket = messageHtmlToTicketObject(message.textHtml);
       const ticketWithAttachmentId = {
         ...ticket,
+        messageId,
         attachmentId: _.first(message.inline).attachmentId,
       };
 
@@ -126,4 +142,5 @@ function parseTo(messageHtml) {
 
 export default {
   findMostRelevantTickets,
+  getQrCodeDataURI,
 }
