@@ -75,7 +75,7 @@ class App extends Component {
             isSignedIn ?
             <Button onClick={this.handleSignoutClick}>Sign out</Button>
             :
-            <Button appearance="primary" onClick={this.handleAuthClick}>Sign in</Button>
+            <Button intent="success" appearance="primary" onClick={this.handleAuthClick}>Sign in</Button>
           }
         </Pane>
 
