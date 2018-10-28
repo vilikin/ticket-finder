@@ -67,42 +67,50 @@ export default class TicketFinder extends Component {
       qrCodeDataURI,
     } = this.state;
 
-    const attachmentId = 'ANGjdJ8pbNgZKhxP45a72rix_JFTMub4ubpKIgTKYS0_QTjupaJLEZ-wVsleHarVeXQ3yokNP9gCQj2KJUBeskyzWFzP8cWv1gnAtjSMYbJRs8qtqzTeEY8jm0tQ9hg3KK93tSsXoxljvmCMkM9J2EpO04SNE_MbqsjbmeJLhC6fVs8GTQJNPit0YHPV3cBsOZhnDuMeqBbLtqF78V_PiPrY77e2pnSPRT72sZZO6f114Lvz3tGltYPBOram8d_BkM_MD-mkM6Qhqlj-uHVTIskLgZwiP3K-Mzm4upFeHvlmPY3Pe1PDTS83WcBRGBTKeAl32Y0b9x3yoy7fUsD-5_Xl9AumW4ZasWIS1WrDqw-rJCTROH8Pn3wT5u_rIQFL-2Epgf6bLFpulJHbKBlL';
-    const messageId = '166a0b135378370c';
+    if (loading) {
+      return (
+        <Pane display="flex" alignItems="center" justifyContent="center" height="90vh">
+          <Spinner />
+        </Pane>
+      );
+    }
 
-    return loading ?
-      <Pane display="flex" alignItems="center" justifyContent="center" height="90vh">
-        <Spinner />
+    if (error) {
+      return <Pane>Error</Pane>;
+    }
+
+    return (
+      <Pane padding={8}>
+        {
+          tickets.map(ticket => (
+            <Ticket tripStartDate={ticket.startDate}
+                    tripStartLocation={ticket.from}
+                    tripEndDate={ticket.endDate}
+                    tripEndLocation={ticket.to}
+                    train={ticket.train}
+                    wagon={ticket.wagon}
+                    seat={ticket.seat}
+                    onClick={() => this.showQrCodeDialog({
+                      attachmentId: ticket.attachmentId,
+                      messageId: ticket.messageId,
+                    })}
+            />
+          ))
+        }
+        <Dialog
+          isShown={showingQrCode}
+          title="Tampere - Tikkurila"
+          onCloseComplete={this.closeQrCodeDialog}
+          hasFooter={false}
+        >
+          <Pane display="flex" alignItems="center" justifyContent="center">
+            {
+              qrCodeDataURI &&
+                <img src={qrCodeDataURI} alt="QR code" height={150} width={150} />
+            }
+          </Pane>
+        </Dialog>
       </Pane>
-      :
-      error ?
-        <Pane>Error</Pane>
-        :
-        <Pane padding={8}>
-          <Ticket onClick={() => this.showQrCodeDialog({
-            attachmentId,
-            messageId,
-          })}/>
-          {
-            tickets.map(ticket => (
-              <Pane margin={8}>
-                {JSON.stringify(ticket)}
-              </Pane>
-            ))
-          }
-          <Dialog
-            isShown={showingQrCode}
-            title="Tampere - Tikkurila"
-            onCloseComplete={this.closeQrCodeDialog}
-            hasFooter={false}
-          >
-            <Pane display="flex" alignItems="center" justifyContent="center">
-              {
-                qrCodeDataURI &&
-                  <img src={qrCodeDataURI} alt="QR code" height={150} width={150} />
-              }
-            </Pane>
-          </Dialog>
-        </Pane>;
+    );
   }
 }

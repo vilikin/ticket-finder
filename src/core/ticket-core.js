@@ -48,7 +48,7 @@ async function* findMostRelevantTickets() {
 
   const messageIds = _.chain(messages)
     .map('id')
-    .slice(0, 1)
+    .slice(0, 4)
     .value();
 
   console.log(messageIds);

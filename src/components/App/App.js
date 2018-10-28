@@ -66,7 +66,7 @@ class App extends Component {
 
     return (
       <Pane>
-        <Pane display="flex" padding={16} background="tint2">
+        <Pane display="flex" padding={16} background="greenTint">
           <Pane flex={1} alignItems="center" display="flex">
             <Heading size={600}>Tickets</Heading>
           </Pane>
