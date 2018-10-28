@@ -5,13 +5,17 @@
   "dependencies": {
     "base64url": "^3.0.0",
     "evergreen-ui": "^4.0.2",
+    "gh-pages": "^2.0.1",
     "gmail-api-parse-message": "^2.1.0",
     "moment": "^2.22.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-scripts": "2.0.4"
   },
+  "homepage": "https://vilikin.github.io/ticket-finder",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "PORT=8080 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
