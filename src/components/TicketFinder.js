@@ -1,8 +1,8 @@
 /* global gapi */
 import React, { Component } from 'react';
 import { Pane, Spinner, Dialog } from 'evergreen-ui';
-import Ticket from '../Ticket/Ticket';
-import ticketCore from './../../core/ticket-core';
+import Ticket from './Ticket';
+import ticketCore from '../core/ticket-core';
 
 export default class TicketFinder extends Component {
   state = {
