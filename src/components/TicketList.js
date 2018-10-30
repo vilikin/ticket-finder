@@ -4,21 +4,21 @@ import { Pane, Spinner, Dialog } from 'evergreen-ui';
 import Ticket from './Ticket';
 import ticketCore from '../core/ticket-core';
 
-export default class TicketFinder extends Component {
+export default class TicketList extends Component {
   state = {
     loading: true,
     error: null,
     tickets: [],
     showingQrCode: false,
     qrCodeDataURI: null,
-  }
+  };
 
   showQrCodeDialog = async (ticket) => {
     this.setState({
       showingQrCode: true,
     });
 
-    const qrCodeDataURI = await ticketCore.getQrCodeDataURI(ticket.messageId, ticket.attachmentId)
+    const qrCodeDataURI = await ticketCore.getQrCodeDataURI(ticket.messageId, ticket.attachmentId);
 
     this.setState({
       qrCodeDataURI,
