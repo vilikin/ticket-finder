@@ -7,7 +7,7 @@ import {
 } from 'evergreen-ui';
 
 import config from '../config';
-import TicketFinder from './TicketFinder';
+import TicketFinder from './TicketList';
 
 // Client ID and API key from the Developer Console
 var CLIENT_ID = config.GOOGLE_CLIENT_ID;
