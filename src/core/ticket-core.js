@@ -1,7 +1,6 @@
 /* global gapi */
 
 import * as _ from 'lodash';
-import * as parseMessage from 'gmail-api-parse-message';
 import {
   getTextBetween,
   timeAndDateStringsToMoment,
@@ -9,73 +8,56 @@ import {
 
 import base64url from 'base64url';
 
-function assertGapiAuthenticated() {
-  if (gapi.auth2.getAuthInstance().isSignedIn.get() === false) {
-    throw new Error('Google API not authenticated');
+export class TicketFinder {
+  constructor(gmailClient) {
+    this.gmailClient = gmailClient;
+  }
+
+  async *findMostRelevantTickets() {
+    const { gmailClient } = this;
+    const messages = await gmailClient.findMessagesByQuery('Matkalippu from:tickets@vr.fi');
+  
+    const messageIds = _.chain(messages)
+      .map('id')
+      .slice(0, 4)
+      .value();
+  
+    console.log(messageIds);
+  
+    let stopOnNextNonRelevantTicket = false;
+    let currentMessageIndex = 0;
+    let foundMostRelevantTicket = false;
+    
+    while (!foundMostRelevantTicket && currentMessageIndex < messageIds.length) {
+      try {
+        const messageId = messageIds[currentMessageIndex];
+        const message = await gmailClient.getMessageDetails(messageId);
+  
+        const ticket = messageHtmlToTicketObject(message.textHtml);
+        const attachmentId = _.first(message.inline).attachmentId;
+        const attachment = await gmailClient.getAttachment(messageId, attachmentId);
+        
+        const ticketWithQrCodeDataURI = {
+          ...ticket,
+          id: messageId,
+          qrCodeDataURI: attachmentToDataURI(attachment.data),
+        };
+  
+        yield ticketWithQrCodeDataURI;
+      } catch (err) {
+        console.error(`Failed to parse message`, err);
+      }
+  
+      currentMessageIndex += 1;
+    }
   }
 }
 
-async function getMessage(id) {
-  const response = await gapi.client.gmail.users.messages.get({
-    'userId': 'me',
-    'id': id,
-  });
-
-  const parsedMessage = parseMessage(response.result);
-  return parsedMessage;
-}
-
-async function getQrCodeDataURI(messageId, attachmentId) {
-  const { result } = await gapi.client.gmail.users.messages.attachments.get({
-    'userId': 'me',
-    'id': attachmentId,
-    'messageId': messageId,
-  });
-
+function attachmentToDataURI(attachmentData) {
   // Gmail API gives us a Base64_urlencoded image
   // We need to convert it to normal Base64 for data URI
-  const base64Image = base64url.toBase64(result.data);
+  const base64Image = base64url.toBase64(attachmentData);
   return `data:image/png;base64,${base64Image}`;
-}
-
-async function* findMostRelevantTickets() {
-  assertGapiAuthenticated();
-  
-  const { result: { messages } } = await gapi.client.gmail.users.messages.list({
-    'userId': 'me',
-    'q': 'Matkalippu from:tickets@vr.fi',
-  });
-
-  const messageIds = _.chain(messages)
-    .map('id')
-    .slice(0, 4)
-    .value();
-
-  console.log(messageIds);
-
-  let stopOnNextNonRelevantTicket = false;
-  let currentMessageIndex = 0;
-  let foundMostRelevantTicket = false;
-  
-  while (!foundMostRelevantTicket && currentMessageIndex < messageIds.length) {
-    try {
-      const messageId = messageIds[currentMessageIndex];
-      const message = await getMessage(messageId);
-
-      const ticket = messageHtmlToTicketObject(message.textHtml);
-      const ticketWithAttachmentId = {
-        ...ticket,
-        messageId,
-        attachmentId: _.first(message.inline).attachmentId,
-      };
-
-      yield ticketWithAttachmentId;
-    } catch (err) {
-      console.error(`Failed to parse message`, err);
-    }
-
-    currentMessageIndex += 1;
-  }
 }
 
 function messageHtmlToTicketObject(messageHtml) {
@@ -138,9 +120,4 @@ function parseTo(messageHtml) {
     time,
     location,
   };
-}
-
-export default {
-  findMostRelevantTickets,
-  getQrCodeDataURI,
 }

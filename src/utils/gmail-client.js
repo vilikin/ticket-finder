@@ -1,6 +1,8 @@
 /* global gapi */
 import React from 'react';
 import * as _ from 'lodash';
+import * as parseMessage from 'gmail-api-parse-message';
+
 import config from '../config';
 
 // Array of API discovery doc URLs for APIs used by the quickstart
@@ -78,6 +80,42 @@ class GmailClient {
 
   isAuthorized = () => {
     return this.authorized;
+  }
+
+  assertAuthorized = () => {
+    if (!this.isAuthorized()) {
+      throw new Error('Google API not authenticated');
+    }
+  }
+
+  findMessagesByQuery = async (query) => {
+    this.assertAuthorized();
+
+    const { result: { messages } } = await gapi.client.gmail.users.messages.list({
+      'userId': 'me',
+      'q': query,
+    });
+
+    return messages;
+  }
+
+  getMessageDetails = async (messageId) => {
+    const { result: message } = await gapi.client.gmail.users.messages.get({
+      'userId': 'me',
+      'id': messageId,
+    });
+  
+    return parseMessage(message);
+  }
+
+  getAttachment = async (messageId, attachmentId) => {
+    const { result: attachment } = await gapi.client.gmail.users.messages.attachments.get({
+      'userId': 'me',
+      'id': attachmentId,
+      'messageId': messageId,
+    });
+
+    return attachment;
   }
 }
 

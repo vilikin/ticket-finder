@@ -39,10 +39,10 @@ const App = (props) => (
               height="calc(100vh - 64px)"
             >
               <Icon icon="train" size={60} color="success"/>
-              <Text size={30} color="muted" marginTop={16} marginX={30} align="center">
+              <Text color="muted" marginTop={16} marginX={30} align="center">
                 Welcome to Ticket Finder!
               </Text>
-              <Text size={30} color="muted" marginTop={16} marginX={30} align="center">
+              <Text color="muted" marginTop={16} marginX={30} align="center">
                 Sign in with your Google account to find train tickets from your Gmail Inbox.
               </Text>
             </Pane>

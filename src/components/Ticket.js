@@ -24,7 +24,7 @@ export default class Ticket extends Component {
     } = this.props;
 
     return (
-      <Pane onClick={onClick} display="flex" flexDirection="row" elevation="1" padding={8} margin={12} borderBottom='3px solid #47B881'>
+      <Pane onClick={onClick} display="flex" flexDirection="row" elevation={1} padding={8} margin={12} borderBottom='3px solid #47B881'>
         <Pane display="flex" flex={1} alignItems="center" justifyContent="center" flexDirection="column">
           <Text fontWeight="bold">{tripStartLocation}</Text>
           <Text size={500}>{getTime(tripStartDate)}</Text>

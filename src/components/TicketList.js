@@ -1,71 +1,33 @@
-/* global gapi */
 import React, { Component } from 'react';
 import { Pane, Spinner, Dialog } from 'evergreen-ui';
 import Ticket from './Ticket';
-import ticketCore from '../core/ticket-core';
+import { TicketFinder } from '../core/ticket-core';
+import { withGmailClient } from '../utils/gmail-client';
 
-export default class TicketList extends Component {
-  state = {
-    loading: true,
-    error: null,
-    tickets: [],
-    showingQrCode: false,
-    qrCodeDataURI: null,
-  };
+class TicketList extends Component {
+  constructor(props) {
+    super(props);
 
-  showQrCodeDialog = async (ticket) => {
-    this.setState({
-      showingQrCode: true,
-    });
+    this.ticketFinder = new TicketFinder(props.client);
 
-    const qrCodeDataURI = await ticketCore.getQrCodeDataURI(ticket.messageId, ticket.attachmentId);
-
-    this.setState({
-      qrCodeDataURI,
-    });
-  }
-
-  closeQrCodeDialog = async () => {
-    this.setState({
-      showingQrCode: false,
-      qrCodeDataURI: null,
-    });
-  }
-
-  fetchTickets = async () => {
-    this.setState({
+    this.state = {
       loading: true,
       error: null,
-    });
+      tickets: [],
+    };
+  }
 
-    try {
-      for await (const ticket of ticketCore.findMostRelevantTickets()) {
-        this.setState({
-          tickets: [ ...this.state.tickets, ticket],
-          loading: false,
-          error: null,
-        });
-      }
-    } catch (error) {
+  async componentDidMount() {
+    for await (const ticket of this.ticketFinder.findMostRelevantTickets()) {
       this.setState({
-        error,
+        tickets: [ ...this.state.tickets, ticket],
         loading: false,
       });
     }
   }
 
-  async componentDidMount() {
-    await this.fetchTickets();
-  }
-
   render() {
-    const {
-      loading,
-      error,
-      tickets,
-      showingQrCode,
-      qrCodeDataURI,
-    } = this.state;
+    const { loading, tickets } = this.state;
 
     if (loading) {
       return (
@@ -75,42 +37,25 @@ export default class TicketList extends Component {
       );
     }
 
-    if (error) {
-      return <Pane>Error</Pane>;
-    }
-
     return (
       <Pane padding={8}>
         {
           tickets.map(ticket => (
-            <Ticket tripStartDate={ticket.startDate}
-                    tripStartLocation={ticket.from}
-                    tripEndDate={ticket.endDate}
-                    tripEndLocation={ticket.to}
-                    train={ticket.train}
-                    wagon={ticket.wagon}
-                    seat={ticket.seat}
-                    onClick={() => this.showQrCodeDialog({
-                      attachmentId: ticket.attachmentId,
-                      messageId: ticket.messageId,
-                    })}
+            <Ticket
+              key={ticket.id}
+              tripStartDate={ticket.startDate}
+              tripStartLocation={ticket.from}
+              tripEndDate={ticket.endDate}
+              tripEndLocation={ticket.to}
+              train={ticket.train}
+              wagon={ticket.wagon}
+              seat={ticket.seat}
             />
           ))
         }
-        <Dialog
-          isShown={showingQrCode}
-          title="Tampere - Tikkurila"
-          onCloseComplete={this.closeQrCodeDialog}
-          hasFooter={false}
-        >
-          <Pane display="flex" alignItems="center" justifyContent="center">
-            {
-              qrCodeDataURI &&
-                <img src={qrCodeDataURI} alt="QR code" height={150} width={150} />
-            }
-          </Pane>
-        </Dialog>
       </Pane>
     );
   }
 }
+
+export default withGmailClient(TicketList);
