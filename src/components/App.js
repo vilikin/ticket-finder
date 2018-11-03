@@ -3,6 +3,8 @@ import {
   Heading,
   Pane,
   Button,
+  Icon,
+  Text,
 } from 'evergreen-ui';
 
 import { withGmailClient } from '../utils/gmail-client';
@@ -27,7 +29,23 @@ const App = (props) => (
     </Pane>
 
       {
-          props.authorized && <TicketList />
+          props.authorized
+          ? <TicketList />
+          : <Pane
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              flexDirection="column"
+              height="calc(100vh - 64px)"
+            >
+              <Icon icon="train" size={60} color="success"/>
+              <Text size={30} color="muted" marginTop={16} marginX={30} align="center">
+                Welcome to Ticket Finder!
+              </Text>
+              <Text size={30} color="muted" marginTop={16} marginX={30} align="center">
+                Sign in with your Google account to find train tickets from your Gmail Inbox.
+              </Text>
+            </Pane>
       }
   </Pane>
 )
