@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Pane, Spinner, Dialog } from 'evergreen-ui';
+import { Pane, Spinner } from 'evergreen-ui';
 import Ticket from './Ticket';
 import { TicketFinder } from '../core/ticket-core';
 import { withGmailClient } from '../utils/gmail-client';
