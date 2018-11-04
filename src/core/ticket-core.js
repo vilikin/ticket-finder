@@ -20,6 +20,19 @@ export const TicketRelevancy = {
   UPCOMING: 'UPCOMING',
 };
 
+export const ResultType = {
+  TICKET: 'TICKET',
+  ERROR: 'ERROR',
+  NON_RELEVANT: 'NON_RELEVANT',
+}
+
+function createYieldableResult(resultType, result) {
+  return {
+    resultType,
+    result,
+  };
+}
+
 export class TicketFinder {
   constructor(gmailClient) {
     this.gmailClient = gmailClient;
@@ -44,6 +57,7 @@ export class TicketFinder {
 
         // if ticket is non relevant, don't fetch more data and prepare to stop
         if (ticketRelevancy === TicketRelevancy.NON_RELEVANT) {
+          yield createYieldableResult(ResultType.NON_RELEVANT);
           console.log('Encountered non-relevant ticket');
 
           if (stopOnNextNonRelevantTicket) {
@@ -62,15 +76,16 @@ export class TicketFinder {
 
         console.log(`Yielding ${ticketRelevancy} ticket`);
   
-        yield {
+        const result = {
           ...ticket,
           id: messageId,
           relevancy: ticketRelevancy,
           qrCodeDataURI: attachmentToDataURI(attachment.data),
         };
+
+        yield createYieldableResult(ResultType.TICKET, result);
       } catch (err) {
-        console.error(`Failed to parse message`, err);
-        yield err;
+        yield createYieldableResult(ResultType.ERROR, err);
       }
     }
   }

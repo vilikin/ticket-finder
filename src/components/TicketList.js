@@ -1,8 +1,24 @@
 import React, { Component } from 'react';
 import { Pane, Spinner } from 'evergreen-ui';
 import Ticket from './Ticket';
-import { TicketFinder } from '../core/ticket-core';
+import { TicketFinder, ResultType } from '../core/ticket-core';
 import { withGmailClient } from '../utils/gmail-client';
+import { getLoadingContext } from '../utils/loading-context';
+
+// Expected amount of yielded results
+const EXPECTED_RESULT_COUNT = 2;
+
+const LoadingContext = getLoadingContext();
+
+// calculates a progress number for the progress bar
+// from 0 to 1, based on count of loaded tickets
+function calculateProgress(resultCount) {
+  let currentExpectedResultCount = EXPECTED_RESULT_COUNT > resultCount
+    ? EXPECTED_RESULT_COUNT
+    : resultCount + 1;
+
+  return resultCount / currentExpectedResultCount;
+}
 
 class TicketList extends Component {
   constructor(props) {
@@ -11,39 +27,45 @@ class TicketList extends Component {
     this.ticketFinder = new TicketFinder(props.client);
 
     this.state = {
-      loading: true,
       error: null,
       tickets: [],
     };
   }
 
   async componentDidMount() {
+    const { setLoading, setProgress } = this.context;
+
+    setLoading(true);
+
     let errorCount = 0;
-    for await (const ticket of this.ticketFinder.findRelevantTickets()) {
-      if (ticket instanceof Error) {
-        errorCount++;
-        continue;
+    let overallResultCount = 0;
+
+    for await (const { resultType, result} of this.ticketFinder.findRelevantTickets()) {
+      
+      if (resultType === ResultType.TICKET) {
+        this.setState({
+          tickets: [ ...this.state.tickets, result],
+        });
       }
 
-      this.setState({
-        tickets: [ ...this.state.tickets, ticket],
-        loading: false,
-      });
+      if (resultType === ResultType.ERROR) {
+        errorCount++;
+      }
+
+      overallResultCount++;
+      const progress = calculateProgress(overallResultCount);
+      setProgress(progress);
     }
+
+    setProgress(1);
+
+    setTimeout(() => setLoading(false), 500);
 
     console.log(`Finished fetching relevant tickets with ${errorCount} error(s).`);
   }
 
   render() {
-    const { loading, tickets } = this.state;
-
-    if (loading) {
-      return (
-        <Pane display="flex" alignItems="center" justifyContent="center" height="90vh">
-          <Spinner />
-        </Pane>
-      );
-    }
+    const { tickets } = this.state;
 
     return (
       <Pane padding={8}>
@@ -59,5 +81,7 @@ class TicketList extends Component {
     );
   }
 }
+
+TicketList.contextType = LoadingContext;
 
 export default withGmailClient(TicketList);

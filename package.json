@@ -4,13 +4,14 @@
   "private": true,
   "dependencies": {
     "base64url": "^3.0.0",
+    "classnames": "^2.2.6",
     "evergreen-ui": "^4.0.2",
     "gh-pages": "^2.0.1",
     "gmail-api-parse-message": "^2.1.0",
     "moment": "^2.22.2",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
-    "react-scripts": "2.0.4"
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-scripts": "^2.1.1"
   },
   "homepage": "https://vilikin.github.io/ticket-finder",
   "scripts": {

@@ -9,6 +9,7 @@ import {
 
 import { withGmailClient } from '../utils/gmail-client';
 import TicketList from './TicketList';
+import ProgressBar from './ProgressBar';
 
 const App = (props) => (
   <Pane>
@@ -28,25 +29,27 @@ const App = (props) => (
 
     </Pane>
 
-      {
-          props.authorized
-          ? <TicketList />
-          : <Pane
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              flexDirection="column"
-              height="calc(100vh - 64px)"
-            >
-              <Icon icon="train" size={60} color="success"/>
-              <Text color="muted" marginTop={16} marginX={30} align="center">
-                Welcome to Ticket Finder!
-              </Text>
-              <Text color="muted" marginTop={16} marginX={30} align="center">
-                Sign in with your Google account to find train tickets from your Gmail Inbox.
-              </Text>
-            </Pane>
-      }
+    <ProgressBar />
+
+    {
+        props.authorized
+        ? <TicketList />
+        : <Pane
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
+            height="calc(100vh - 64px)"
+          >
+            <Icon icon="train" size={60} color="success"/>
+            <Text color="muted" marginTop={16} marginX={30} align="center">
+              Welcome to Ticket Finder!
+            </Text>
+            <Text color="muted" marginTop={16} marginX={30} align="center">
+              Sign in with your Google account to find train tickets from your Gmail Inbox.
+            </Text>
+          </Pane>
+    }
   </Pane>
 )
 
