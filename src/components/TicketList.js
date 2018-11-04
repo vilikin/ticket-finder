@@ -43,13 +43,7 @@ class TicketList extends Component {
           tickets.map(ticket => (
             <Ticket
               key={ticket.id}
-              tripStartDate={ticket.startDate}
-              tripStartLocation={ticket.from}
-              tripEndDate={ticket.endDate}
-              tripEndLocation={ticket.to}
-              train={ticket.train}
-              wagon={ticket.wagon}
-              seat={ticket.seat}
+              {...ticket}
             />
           ))
         }

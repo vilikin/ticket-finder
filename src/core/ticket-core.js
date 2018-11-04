@@ -66,8 +66,8 @@ function messageHtmlToTicketObject(messageHtml) {
   const dateRaw = getTextBetween(messageHtml,
       '<span style="color:#077f00;">', '</span>', 2);
   
-  const startDate = timeAndDateStringsToMoment(from.time, dateRaw);
-  const endDate = timeAndDateStringsToMoment(to.time, dateRaw);
+  const tripStartDate = timeAndDateStringsToMoment(from.time, dateRaw);
+  const tripEndDate = timeAndDateStringsToMoment(to.time, dateRaw);
   
   const train = getTextBetween(messageHtml,
       '<span style="font-size:14px;line-height:1.5;">', ',');
@@ -75,18 +75,18 @@ function messageHtmlToTicketObject(messageHtml) {
       '<b style="font-size:24px;line-height:1.5;color:#077f00;">', ' </b>');
   const seat = getTextBetween(messageHtml,
       '<b style="font-size:24px;line-height:1.5;color:#077f00;">', ' </b>', 2);
-  const type = getTextBetween(messageHtml,
+  const ticketFor = getTextBetween(messageHtml,
       '<span style="font-size:16px;">', '</span>', 2);
 
   return {
-    from: from.location,
-    to: to.location,
-    startDate,
-    endDate,
+    tripStartLocation: from.location,
+    tripEndLocation: to.location,
+    tripStartDate,
+    tripEndDate,
     train,
     wagon,
     seat,
-    type,
+    ticketFor,
   };
 }
 
