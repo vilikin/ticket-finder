@@ -18,12 +18,20 @@ class TicketList extends Component {
   }
 
   async componentDidMount() {
-    for await (const ticket of this.ticketFinder.findMostRelevantTickets()) {
+    let errorCount = 0;
+    for await (const ticket of this.ticketFinder.findRelevantTickets()) {
+      if (ticket instanceof Error) {
+        errorCount++;
+        continue;
+      }
+
       this.setState({
         tickets: [ ...this.state.tickets, ticket],
         loading: false,
       });
     }
+
+    console.log(`Finished fetching relevant tickets with ${errorCount} error(s).`);
   }
 
   render() {

@@ -6,51 +6,83 @@ import {
   timeAndDateStringsToMoment,
 } from '../utils/helpers';
 
+import * as moment from 'moment';
 import base64url from 'base64url';
+
+export const TicketRelevancy = {
+  NON_RELEVANT: 'NON_RELEVANT',
+  CURRENT: 'CURRENT',
+  UPCOMING: 'UPCOMING',
+};
 
 export class TicketFinder {
   constructor(gmailClient) {
     this.gmailClient = gmailClient;
   }
 
-  async *findMostRelevantTickets() {
+  async *findRelevantTickets() {
     const { gmailClient } = this;
     const messages = await gmailClient.findMessagesByQuery('Matkalippu from:tickets@vr.fi');
   
-    const messageIds = _.chain(messages)
-      .map('id')
-      .slice(0, 4)
-      .value();
+    const messageIds = _.map(messages, 'id');
   
     console.log(messageIds);
   
     let stopOnNextNonRelevantTicket = false;
-    let currentMessageIndex = 0;
-    let foundMostRelevantTicket = false;
     
-    while (!foundMostRelevantTicket && currentMessageIndex < messageIds.length) {
+    for (const messageId of messageIds) {
       try {
-        const messageId = messageIds[currentMessageIndex];
         const message = await gmailClient.getMessageDetails(messageId);
   
         const ticket = messageHtmlToTicketObject(message.textHtml);
+        const ticketRelevancy = getTicketRelevancy(ticket.tripStartDate, ticket.tripEndDate);
+
+        // if ticket is non relevant, don't fetch more data and prepare to stop
+        if (ticketRelevancy === TicketRelevancy.NON_RELEVANT) {
+          console.log('Encountered non relevant ticket');
+
+          if (stopOnNextNonRelevantTicket) {
+            console.log('Stopping.');
+            // if previous ticket was also non relevant, assume there will be no more relevant tickets
+            break;
+          }
+
+          console.log('Stopping if next ticket is also non-relevant');
+          stopOnNextNonRelevantTicket = true;
+          continue;
+        }
+
         const attachmentId = _.first(message.inline).attachmentId;
         const attachment = await gmailClient.getAttachment(messageId, attachmentId);
-        
-        const ticketWithQrCodeDataURI = {
+
+        console.log(`Yielding ${ticketRelevancy} ticket`);
+  
+        yield {
           ...ticket,
           id: messageId,
+          relevancy: ticketRelevancy,
           qrCodeDataURI: attachmentToDataURI(attachment.data),
         };
-  
-        yield ticketWithQrCodeDataURI;
       } catch (err) {
         console.error(`Failed to parse message`, err);
+        yield err;
       }
-  
-      currentMessageIndex += 1;
     }
   }
+}
+
+function getTicketRelevancy(tripStartDate, tripEndDate) {
+  const now = moment('2018-10-24 08:30');
+
+  if (now.isAfter(tripEndDate)) {
+    return TicketRelevancy.NON_RELEVANT;
+  }
+
+  if (now.isBefore(tripStartDate)) {
+    return TicketRelevancy.UPCOMING;
+  }
+
+  return TicketRelevancy.CURRENT;
 }
 
 function attachmentToDataURI(attachmentData) {

@@ -7,5 +7,5 @@ export function getTextBetween(full, start, end, splitStartIndex = 1) {
 export function timeAndDateStringsToMoment(timeString, dateString) {
   const dateFormat = 'DD.MM.YYYY HH:mm'
   const combinedString = `${dateString} ${timeString}`;
-  return moment(combinedString, dateFormat).add(3, 'hours');
+  return moment(combinedString, dateFormat);
 }
