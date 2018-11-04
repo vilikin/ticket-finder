@@ -1,5 +1,3 @@
-/* global gapi */
-
 import * as _ from 'lodash';
 import {
   getTextBetween,
