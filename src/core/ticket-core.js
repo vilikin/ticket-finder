@@ -9,6 +9,13 @@ import {
 import * as moment from 'moment';
 import base64url from 'base64url';
 
+const params = new URLSearchParams(window.location.search);
+const DEBUG_MODE = params.get('debug') === 'true';
+
+if (DEBUG_MODE) {
+  console.warn('TicketCore is in debug mode!');
+}
+
 export const TicketRelevancy = {
   NON_RELEVANT: 'NON_RELEVANT',
   CURRENT: 'CURRENT',
@@ -39,7 +46,7 @@ export class TicketFinder {
 
         // if ticket is non relevant, don't fetch more data and prepare to stop
         if (ticketRelevancy === TicketRelevancy.NON_RELEVANT) {
-          console.log('Encountered non relevant ticket');
+          console.log('Encountered non-relevant ticket');
 
           if (stopOnNextNonRelevantTicket) {
             console.log('Stopping.');
@@ -72,7 +79,7 @@ export class TicketFinder {
 }
 
 function getTicketRelevancy(tripStartDate, tripEndDate) {
-  const now = moment('2018-10-24 08:30');
+  const now = DEBUG_MODE ? moment('2018-10-24 08:30') : moment();
 
   if (now.isAfter(tripEndDate)) {
     return TicketRelevancy.NON_RELEVANT;
