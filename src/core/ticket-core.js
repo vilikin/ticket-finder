@@ -7,6 +7,9 @@ import {
 import * as moment from 'moment';
 import base64url from 'base64url';
 
+// how many subsequent non-relevant tickets will interrupt the ticket search
+const NON_RELEVANT_TOLERANCE = 2;
+
 const params = new URLSearchParams(window.location.search);
 const DEBUG_MODE = params.get('debug') === 'true';
 
@@ -46,7 +49,7 @@ export class TicketFinder {
   
     console.log(messageIds);
   
-    let stopOnNextNonRelevantTicket = false;
+    let nonRelevantSubsequentTicketCount = 0;
     
     for (const messageId of messageIds) {
       try {
@@ -60,14 +63,14 @@ export class TicketFinder {
           yield createYieldableResult(ResultType.NON_RELEVANT);
           console.log('Encountered non-relevant ticket');
 
-          if (stopOnNextNonRelevantTicket) {
+          if (nonRelevantSubsequentTicketCount === NON_RELEVANT_TOLERANCE) {
             console.log('Stopping.');
             // if previous ticket was also non relevant, assume there will be no more relevant tickets
             break;
           }
 
           console.log('Stopping if next ticket is also non-relevant');
-          stopOnNextNonRelevantTicket = true;
+          nonRelevantSubsequentTicketCount++;
           continue;
         }
 
@@ -82,6 +85,8 @@ export class TicketFinder {
           relevancy: ticketRelevancy,
           qrCodeDataURI: attachmentToDataURI(attachment.data),
         };
+
+        nonRelevantSubsequentTicketCount = 0;
 
         yield createYieldableResult(ResultType.TICKET, result);
       } catch (err) {

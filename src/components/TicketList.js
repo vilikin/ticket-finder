@@ -68,7 +68,7 @@ class TicketList extends Component {
     const { tickets } = this.state;
 
     return (
-      <Pane padding={8}>
+      <Pane marginX={8} marginTop={2}>
         {
           tickets.map(ticket => (
             <Ticket

@@ -1,5 +1,5 @@
 .progress-bar {
-  height: 5px;
+  height: 6px;
   width: 100vw;
   background-color: #D4EEE2;
   opacity: 0;
@@ -13,5 +13,5 @@
 .progress-bar > .fill {
   height: 100%;
   background-color: #47B881;
-  transition: width 0.5s;
+  transition: width 1s;
 }
