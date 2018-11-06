@@ -2,7 +2,7 @@ import React from 'react';
 import './ProgressBar.css';
 import classNames from 'classnames';
 
-import { getLoadingContext } from '../utils/loading-context';
+import { getLoadingContext } from '../../utils/loading-context';
 
 const LoadingContext = getLoadingContext();
 

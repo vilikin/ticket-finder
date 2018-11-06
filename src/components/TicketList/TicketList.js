@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Pane, Spinner } from 'evergreen-ui';
-import Ticket from './Ticket';
-import { TicketFinder, ResultType } from '../core/ticket-core';
-import { withGmailClient } from '../utils/gmail-client';
-import { getLoadingContext } from '../utils/loading-context';
+import { Pane, } from 'evergreen-ui';
+import Ticket from '../Ticket/Ticket';
+import { TicketFinder, ResultType } from '../../core/ticket-core';
+import { withGmailClient } from '../../utils/gmail-client';
+import { getLoadingContext } from '../../utils/loading-context';
 
 // Expected amount of yielded results
 const EXPECTED_RESULT_COUNT = 2;

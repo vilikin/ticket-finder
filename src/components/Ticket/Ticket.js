@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Pane, Text, Icon } from 'evergreen-ui';
 import * as moment from 'moment';
-import { TicketRelevancy } from '../core/ticket-core';
+import { TicketRelevancy } from '../../core/ticket-core';
 
 function getTime(date) {
   return moment(date).format('HH:mm');

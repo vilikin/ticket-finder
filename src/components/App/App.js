@@ -7,9 +7,9 @@ import {
   Text,
 } from 'evergreen-ui';
 
-import { withGmailClient } from '../utils/gmail-client';
-import TicketList from './TicketList';
-import ProgressBar from './ProgressBar';
+import { withGmailClient } from '../../utils/gmail-client';
+import TicketList from '../TicketList/TicketList';
+import ProgressBar from '../ProgressBar/ProgressBar';
 
 const App = (props) => (
   <Pane>
