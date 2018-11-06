@@ -7,9 +7,6 @@ import {
 import * as moment from 'moment';
 import base64url from 'base64url';
 
-// how many subsequent non-relevant tickets will interrupt the ticket search
-const NON_RELEVANT_TOLERANCE = 2;
-
 const params = new URLSearchParams(window.location.search);
 const DEBUG_MODE = params.get('debug') === 'true';
 
@@ -41,7 +38,7 @@ export class TicketFinder {
     this.gmailClient = gmailClient;
   }
 
-  async *findRelevantTickets() {
+  async *findRelevantTickets(nonRelevantSubsequentTicketTolerance) {
     const { gmailClient } = this;
     const messages = await gmailClient.findMessagesByQuery('Matkalippu from:tickets@vr.fi');
   
@@ -63,7 +60,7 @@ export class TicketFinder {
           yield createYieldableResult(ResultType.NON_RELEVANT);
           console.log('Encountered non-relevant ticket');
 
-          if (nonRelevantSubsequentTicketCount === NON_RELEVANT_TOLERANCE) {
+          if (nonRelevantSubsequentTicketCount === nonRelevantSubsequentTicketTolerance) {
             console.log('Stopping.');
             // if previous ticket was also non relevant, assume there will be no more relevant tickets
             break;

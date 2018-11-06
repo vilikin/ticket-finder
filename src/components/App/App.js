@@ -39,7 +39,7 @@ const App = (props) => (
             alignItems="center"
             justifyContent="center"
             flexDirection="column"
-            height="calc(100vh - 64px)"
+            height="calc(100vh - 70px)"
           >
             <Icon icon="train" size={60} color="success"/>
             <Text color="muted" marginTop={16} marginX={30} align="center">

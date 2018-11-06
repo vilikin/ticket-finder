@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Pane, } from 'evergreen-ui';
+import { Pane, Icon, Text, Button } from 'evergreen-ui';
 import Ticket from '../Ticket/Ticket';
 import { TicketFinder, ResultType } from '../../core/ticket-core';
 import { withGmailClient } from '../../utils/gmail-client';
@@ -33,15 +33,21 @@ class TicketList extends Component {
   }
 
   async componentDidMount() {
+    this.fetchTickets(2);
+  }
+
+  fetchTickets = async (nonRelevantSubsequentTicketTolerance) => {
     const { setLoading, setProgress } = this.context;
+    const { findRelevantTickets } = this.ticketFinder;
 
     setLoading(true);
 
     let errorCount = 0;
     let overallResultCount = 0;
 
-    for await (const { resultType, result} of this.ticketFinder.findRelevantTickets()) {
-      
+    for await (
+      const { resultType, result} of findRelevantTickets(nonRelevantSubsequentTicketTolerance)
+    ) {
       if (resultType === ResultType.TICKET) {
         this.setState({
           tickets: [ ...this.state.tickets, result],
@@ -66,7 +72,16 @@ class TicketList extends Component {
 
   render() {
     const { tickets } = this.state;
+    const { loading } = this.context;
 
+    if (loading || tickets.length > 0) {
+      return this.renderTickets(tickets);
+    } else {
+      return this.renderNotFound();
+    }
+  }
+
+  renderTickets(tickets) {
     return (
       <Pane marginX={8} marginTop={2}>
         {
@@ -77,6 +92,28 @@ class TicketList extends Component {
             />
           ))
         }
+      </Pane>
+    );
+  }
+
+  renderNotFound = () => {
+    return (
+      <Pane
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        flexDirection="column"
+        height="calc(100vh - 70px)"
+      >
+        <Icon icon="flag" size={60} color="success"/>
+        <Text color="muted" marginTop={16} marginX={30} align="center">
+        </Text>
+        <Text color="muted" marginTop={16} marginX={30} align="center">
+          I couldn't find any relevant tickets from your inbox. That might just be my bad: consider using the Gmail app to find the ticket. If you'd like, I can also try dig deeper in your inbox.
+        </Text>
+        <Button marginTop={16}>
+          Try harder
+        </Button>
       </Pane>
     );
   }
